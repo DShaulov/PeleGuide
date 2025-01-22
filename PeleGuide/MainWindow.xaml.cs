@@ -31,5 +31,10 @@ namespace PeleGuide
                 resultTextBlock.Text = $"Hello, {name}!";
             }
         }
+
+        private void Button_Click_Dont(object sender, RoutedEventArgs e)
+        {
+            resultTextBlock.Text = "Why did you do that?";
+        }
     }
 }
