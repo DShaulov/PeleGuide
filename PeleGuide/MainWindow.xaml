@@ -3,17 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="PeleGuide" Height="450" Width="800">
     <Grid>
-        <StackPanel Margin="20">
-            <TextBlock Text="Enter your name:" Margin="0,0,0,5"/>
-            <TextBox x:Name="nameTextBox" Width="200" 
-                     HorizontalAlignment="Left" Margin="0,0,0,10"/>
-            <Button Content="Say Hello" Click="Button_Click" 
-                    Width="100" HorizontalAlignment="Left"/>
-            <TextBox x:Name="dontTextBox" Width="200" 
-                    HorizontalAlignment="Left" Margin="0,0,0,10"/>
-            <Button Content="Dont Click" Click="Button_Click_Dont" 
-                    Width="100" HorizontalAlignment="Left"/>
-            <TextBlock x:Name="resultTextBlock" Margin="0,20,0,0"/>
-        </StackPanel>
+        <WebBrowser x:Name="docViewer"/>
     </Grid>
 </Window>

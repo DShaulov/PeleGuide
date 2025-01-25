@@ -8,7 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using Window = System.Windows.Window;
 
 namespace PeleGuide
 {
@@ -18,23 +18,6 @@ namespace PeleGuide
         {
             InitializeComponent();
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            string name = nameTextBox.Text;
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                resultTextBlock.Text = "Please enter a name!";
-            }
-            else
-            {
-                resultTextBlock.Text = $"Hello, {name}!";
-            }
-        }
-
-        private void Button_Click_Dont(object sender, RoutedEventArgs e)
-        {
-            resultTextBlock.Text = "Why did you do that?";
-        }
     }
+
 }
