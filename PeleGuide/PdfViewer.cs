@@ -1,6 +1,7 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Controls;
 
@@ -18,15 +19,26 @@ public class PdfViewer
     {
         await webView.EnsureCoreWebView2Async();
 
+        // Map the application base directory which contains both pdfjs and Resources folder
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        webView.CoreWebView2.SetVirtualHostNameToFolderMapping(
+            "app",
+            baseDir,
+            CoreWebView2HostResourceAccessKind.Allow);
+
+        Debug.WriteLine($"Mapped virtual host 'app' to: {baseDir}");
+
         ConfigureWebViewSettings();
         ConfigureSecuritySettings();
         LoadDefaultViewer();
+        TestPdfViewer();
+
     }
 
     private void ConfigureWebViewSettings()
     {
         webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
-        webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
+        webView.CoreWebView2.Settings.AreDevToolsEnabled = true;
         webView.CoreWebView2.Settings.IsZoomControlEnabled = true;
         webView.CoreWebView2.Settings.IsWebMessageEnabled = true;
         webView.CoreWebView2.Settings.AreHostObjectsAllowed = true;
@@ -64,11 +76,40 @@ public class PdfViewer
     /// <param name="pdfPath"></param>
     public void LoadPdf(string pdfPath)
     {
-        if (webView?.CoreWebView2 == null) return;
+        if (webView?.CoreWebView2 == null)
+        {
+            Debug.WriteLine("WebView2 is not initialized");
+            return;
+        }
 
-        string pdfUrl = new Uri(pdfPath).AbsoluteUri;
-        string viewerUrl = $"{webView.Source.AbsoluteUri}?file={Uri.EscapeDataString(pdfUrl)}";
-        webView.CoreWebView2.Navigate(viewerUrl);
+        // Use the path relative to your application directory
+        string virtualPdfUrl = "http://app/Resources/Documents/Test.pdf";
+        string viewerUri = $"http://app/pdfjs/web/viewer.html?file={virtualPdfUrl}";
+
+        Debug.WriteLine($"Loading PDF from: {pdfPath}");
+        Debug.WriteLine($"Virtual PDF URL: {virtualPdfUrl}");
+        Debug.WriteLine($"Final URI: {viewerUri}");
+
+        webView.CoreWebView2.Navigate(viewerUri);
+    }
+
+    public void TestPdfViewer()
+    {
+        string testPdfPath = @"C:\David\PDF-TEST\Test.pdf";  // Make sure you have a PDF file with this name
+
+        // Log each step to understand what's happening
+        Debug.WriteLine($"Testing PDF at path: {testPdfPath}");
+        Debug.WriteLine($"File exists: {File.Exists(testPdfPath)}");
+
+        try
+        {
+            LoadPdf(testPdfPath);
+            Debug.WriteLine("Navigation initiated successfully");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error loading PDF: {ex.Message}");
+        }
     }
 
     public void Dispose()

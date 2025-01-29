@@ -22,7 +22,6 @@ namespace PeleGuide
         {
             InitializeComponent();
             pdfViewer = new PdfViewer(webView);
-            LoadPdfDocument("file.pdf");
         }
 
         private void LoadPdfDocument(string path)
