@@ -3,60 +3,58 @@ using Microsoft.Web.WebView2.Wpf;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Windows;
 using System.Windows.Controls;
 
 public class PdfViewer
 {
     private readonly WebView2 webView;
+    private string pdfFilesDir;
+    private string pdfJsDir;
+    private string virtualPdfFilesUrl;
 
     public PdfViewer(WebView2 webView)
     {
         this.webView = webView;
+        pdfFilesDir = @"C:\David\PDF-TEST\";
+        pdfJsDir = AppDomain.CurrentDomain.BaseDirectory;
+        virtualPdfFilesUrl = "http://pdf-files/";
         InitializeAsync();
     }
 
     private async void InitializeAsync()
     {
         await webView.EnsureCoreWebView2Async();
+ 
 
-        // Map the application base directory which contains both pdfjs and Resources folder
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Map the directory which pdfjs
         webView.CoreWebView2.SetVirtualHostNameToFolderMapping(
-            "app",
-            baseDir,
+            "pdf-viewer",
+            pdfJsDir,
             CoreWebView2HostResourceAccessKind.Allow);
 
-        Debug.WriteLine($"Mapped virtual host 'app' to: {baseDir}");
+        Debug.WriteLine($"Mapped virtual host 'pdf-viewer' to: {pdfJsDir}");
 
-        ConfigureWebViewSettings();
-        ConfigureSecuritySettings();
+        // Map the directory which pdfjs
+        webView.CoreWebView2.SetVirtualHostNameToFolderMapping(
+            "pdf-files",
+            pdfFilesDir,
+            CoreWebView2HostResourceAccessKind.Allow);
+
+        Debug.WriteLine($"Mapped virtual host 'pdf-files' to: {pdfFilesDir}");
+
         LoadDefaultViewer();
         TestPdfViewer();
-
     }
 
-    private void ConfigureWebViewSettings()
+    private void ChangeBaseDirectory(string newBaseDir)
     {
-        webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
-        webView.CoreWebView2.Settings.AreDevToolsEnabled = true;
-        webView.CoreWebView2.Settings.IsZoomControlEnabled = true;
-        webView.CoreWebView2.Settings.IsWebMessageEnabled = true;
-        webView.CoreWebView2.Settings.AreHostObjectsAllowed = true;
-    }
-
-    private void ConfigureSecuritySettings()
-    {
-        webView.CoreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
-        webView.CoreWebView2.WebResourceRequested += HandleWebResourceRequest;
-    }
-
-    private void HandleWebResourceRequest(object sender, CoreWebView2WebResourceRequestedEventArgs e)
-    {
-        if (e.Request.Uri.StartsWith("file://", StringComparison.OrdinalIgnoreCase))
-        {
-            e.Request.Headers.SetHeader("Cross-Origin-Opener-Policy", "same-origin");
-            e.Request.Headers.SetHeader("Cross-Origin-Embedder-Policy", "require-corp");
-        }
+        pdfFilesDir = newBaseDir;
+        webView.CoreWebView2.SetVirtualHostNameToFolderMapping(
+            "app",
+            pdfFilesDir,
+            CoreWebView2HostResourceAccessKind.Allow);
+        Debug.WriteLine($"Mapped virtual host 'app' to: {pdfFilesDir}");
     }
 
     /// <summary>
@@ -64,8 +62,7 @@ public class PdfViewer
     /// </summary>
     private void LoadDefaultViewer()
     {
-        string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        string pdfViewerPath = Path.Combine(baseDirectory, "pdfjs", "web", "viewer.html");
+        string pdfViewerPath = Path.Combine(pdfJsDir, "pdfjs", "web", "viewer.html");
         string fileUrl = new Uri(pdfViewerPath).AbsoluteUri;
         webView.Source = new Uri(fileUrl);
     }
@@ -82,41 +79,35 @@ public class PdfViewer
             return;
         }
 
-        // Use the path relative to your application directory
-        string virtualPdfUrl = "http://app/Resources/Documents/Test.pdf";
-        string viewerUri = $"http://app/pdfjs/web/viewer.html?file={virtualPdfUrl}";
+        // Uses the virtual host 'app' to access the PDF file
+        string virtualPdfUrl = ConvertToVirtualUrl(pdfPath);
+        string viewerUri = $"http://pdf-viewer/pdfjs/web/viewer.html?file={virtualPdfUrl}";
 
         Debug.WriteLine($"Loading PDF from: {pdfPath}");
         Debug.WriteLine($"Virtual PDF URL: {virtualPdfUrl}");
         Debug.WriteLine($"Final URI: {viewerUri}");
-
+        string script = $@"PDFViewerApplication.open({{
+            url: 'https://local.pdfs/Test.pdf'
+        }}).then(() => {{
+            console.log('PDF loaded successfully');
+        }});";
         webView.CoreWebView2.Navigate(viewerUri);
     }
 
+    public string ConvertToVirtualUrl(string pdfPath)
+    {
+        return pdfPath.Replace($"{pdfFilesDir}", $"{virtualPdfFilesUrl}").Replace("\\", "/");
+    }
     public void TestPdfViewer()
     {
-        string testPdfPath = @"C:\David\PDF-TEST\Test.pdf";  // Make sure you have a PDF file with this name
-
-        // Log each step to understand what's happening
-        Debug.WriteLine($"Testing PDF at path: {testPdfPath}");
-        Debug.WriteLine($"File exists: {File.Exists(testPdfPath)}");
-
         try
         {
-            LoadPdf(testPdfPath);
+            LoadPdf(@"C:\David\PDF-TEST\Resources\Documents\Test.pdf");
             Debug.WriteLine("Navigation initiated successfully");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error loading PDF: {ex.Message}");
-        }
-    }
-
-    public void Dispose()
-    {
-        if (webView?.CoreWebView2 != null)
-        {
-            webView.CoreWebView2.WebResourceRequested -= HandleWebResourceRequest;
         }
     }
 }

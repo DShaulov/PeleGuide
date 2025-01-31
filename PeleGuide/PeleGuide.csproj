@@ -24,6 +24,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Images\folder.png" />
+	  <None Remove="Images\pdf.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Images\folder.png" />
+	  <Resource Include="Images\pdf.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Update="Resource\Documents\*.pdf">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

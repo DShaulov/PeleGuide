@@ -17,29 +17,40 @@ namespace PeleGuide
     public partial class MainWindow : Window
     {
         private readonly PdfViewer pdfViewer;
+        private readonly FolderScanner folderScanner;
+
 
         public MainWindow()
         {
             InitializeComponent();
             pdfViewer = new PdfViewer(webView);
+            folderScanner = new FolderScanner();
+            fileTreeView.ItemsSource = folderScanner.TreeItems;
+
+            folderScanner.ScanFolder(@"C:\David\PDF-TEST");
         }
 
-        private void LoadPdfDocument(string path)
+        /// <summary>
+        /// Event handler for when a tree view item is selected.
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HandleFileSelection(object sender, MouseButtonEventArgs e)
         {
-            // Get the application's base directory
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-
-            // Construct path to the PDF
-            string pdfPath = System.IO.Path.Combine(baseDirectory, "Resource", "Documents", "Test File.pdf");
-
-            // Convert to URI format
-            string pdfUrl = new Uri(pdfPath).AbsoluteUri;
-            pdfViewer.LoadPdf(pdfPath);
+            var treeView = sender as TreeView;
+            var item = treeView.SelectedItem;
+            if (item is FileTreeItem fileItem)
+            {
+                if (fileItem.Type == "PDF")
+                {
+                    pdfViewer.LoadPdf(fileItem.FullPath);
+                }
+            }
         }
 
         protected override void OnClosed(EventArgs e)
         {
-            pdfViewer.Dispose();
             base.OnClosed(e);
         }
     }

@@ -4,6 +4,91 @@
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="PeleGuide" Height="450" Width="800">
     <Grid>
-        <wv2:WebView2 x:Name="webView" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="200"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Search Bar -->
+        <Grid Grid.Row="0" 
+              Grid.Column="0" 
+              Margin="10,5"
+              HorizontalAlignment="Center"
+              Width="300">
+            <TextBox x:Name="searchBox" 
+                Height="30" 
+                VerticalAlignment="Center"
+                Padding="5,0,30,0">
+                <TextBox.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </TextBox.Resources>
+            </TextBox>
+            <Button Width="30" 
+                    Height="30"
+                    HorizontalAlignment="Right"
+                    Background="Transparent"
+                    BorderThickness="0">
+                <Path Data="M12,9A3,3 0 0,1 9,12A3,3 0 0,1 6,9A3,3 0 0,1 9,6A3,3 0 0,1 12,9M17.5,14.5L13.2,10.2C13.7,9.4 14,8.5 14,7.5C14,4.5 11.5,2 8.5,2C5.5,2 3,4.5 3,7.5C3,10.5 5.5,13 8.5,13C9.5,13 10.4,12.7 11.2,12.2L15.5,16.5L17.5,14.5Z"
+                      Fill="#666666"
+                      Stretch="Uniform"
+                      Margin="5"/>
+            </Button>
+        </Grid>
+
+        <!-- WebView -->
+        <wv2:WebView2 x:Name="webView" 
+                      Grid.Row="1" 
+                      Grid.Column="0"/>
+
+        <!-- Sidebar -->
+        <Border Grid.Row="0" 
+        Grid.RowSpan="2" 
+        Grid.Column="1" 
+        BorderThickness="1,0,0,0" 
+        BorderBrush="#DDDDDD"
+        FlowDirection="RightToLeft"
+        Background="#F5F5F5">
+            <DockPanel Margin="10">
+                <TextBlock Text="סרגל" 
+                  FontWeight="Bold" 
+                  Margin="0,0,0,10"
+                  DockPanel.Dock="Top"/>
+                <TreeView x:Name="fileTreeView"
+                          MouseDoubleClick="HandleFileSelection">
+                    <TreeView.Resources>
+                        <Style TargetType="TreeViewItem">
+                            <Setter Property="IsExpanded" Value="True"/>
+                        </Style>
+                    </TreeView.Resources>
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Items}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Width="16" Height="16" Margin="0,0,5,0">
+                                    <Image.Style>
+                                        <Style TargetType="Image">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Type}" Value="Folder">
+                                                    <Setter Property="Source" Value="/Images/folder.png"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Type}" Value="PDF">
+                                                    <Setter Property="Source" Value="/Images/pdf.png"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                                <TextBlock Text="{Binding Name}"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </DockPanel>
+        </Border>
     </Grid>
 </Window>
