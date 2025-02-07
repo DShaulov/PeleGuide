@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PeleGuide
 {
-    public class PdfSearchResult
+    public class SearchResult
     {
         public string FilePath { get; set; }
         public int PageNumber { get; set; }

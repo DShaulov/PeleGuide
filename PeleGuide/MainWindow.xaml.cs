@@ -26,6 +26,17 @@ namespace PeleGuide
             pdfViewer = new PdfViewer(webView);
             folderScanner = new FolderScanner();
             fileTreeView.ItemsSource = folderScanner.TreeItems;
+            searchBox.KeyDown += async (s, e) => {
+                if (e.Key == Key.Enter)
+                {
+                    webView.Visibility = Visibility.Collapsed;
+                    ResultsListView.Visibility = Visibility.Visible;
+
+                    var progress = new Progress<double>();
+                    var results = await PdfSearch.SearchPdfsInFolder(@"C:\David\PDF-TEST", searchBox.Text, progress);
+                    ResultsListView.ItemsSource = results;
+                }
+            };
 
             folderScanner.ScanFolder(@"C:\David\PDF-TEST");
         }
@@ -44,6 +55,7 @@ namespace PeleGuide
             {
                 if (fileItem.Type == "PDF")
                 {
+                    ShowWebView();
                     pdfViewer.LoadPdf(fileItem.FullPath);
                 }
             }
@@ -52,6 +64,33 @@ namespace PeleGuide
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
+        }
+
+        public async void HandleSearch(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                SearchProgress.Value = 0;
+                ResultsListView.ItemsSource = null;
+                var progress = new Progress<double>(value => SearchProgress.Value = value);
+
+                var results = await PdfSearch.SearchPdfsInFolder(
+                    @"C:\David\PDF-TEST",
+                    searchBox.Text,
+                    progress);
+
+                ResultsListView.ItemsSource = results;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error performing search: {ex.Message}");
+            }
+        }
+
+        private void ShowWebView()
+        {
+            webView.Visibility = Visibility.Visible;
+            ResultsListView.Visibility = Visibility.Collapsed;
         }
 
         public void OnTitleBarMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -97,6 +136,7 @@ namespace PeleGuide
             }
         }
 
+        // Methods for handling clicks on the title bar buttons
         public void OnMinimizeButtonClick(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
@@ -115,5 +155,4 @@ namespace PeleGuide
             Close();
         }
     }
-
 }
