@@ -33,7 +33,6 @@ namespace PeleGuide
                     Console.WriteLine($"Error processing file {pdfFile}: {ex.Message}");
                 }
             }
-
             return results;
         }
 

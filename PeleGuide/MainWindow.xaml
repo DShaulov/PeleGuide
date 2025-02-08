@@ -77,7 +77,6 @@
                               HorizontalAlignment="Right">
                         <Button x:Name="MinimizeButton"
                                 Width="46" Height="32"
-                                Click="OnMinimizeButtonClick"
                                 Style="{StaticResource WindowControlButtonStyle}">
                             <Path Data="M 0,0 H 10"
                                   Stroke="{StaticResource ClaudeTextPrimary}"
@@ -87,7 +86,6 @@
                         </Button>
                         <Button x:Name="MaximizeButton"
                                 Width="46" Height="32"
-                                Click="OnMaximizeButtonClick"
                                 Style="{StaticResource WindowControlButtonStyle}">
                             <Path Data="M 0,0 H 10 V 10 H 0 Z"
                                   Stroke="{StaticResource ClaudeTextPrimary}"
@@ -98,7 +96,6 @@
                         </Button>
                         <Button x:Name="CloseButton"
                                 Width="46" Height="32"
-                                Click="OnCloseButtonClick"
                                 Style="{StaticResource WindowControlButtonStyle}">
                             <Path Data="M 0,0 L 10,10 M 0,10 L 10,0"
                                   Stroke="{StaticResource ClaudeTextPrimary}"
@@ -128,7 +125,13 @@
                   Margin="10,5"
                   HorizontalAlignment="Center"
                   Width="300">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
                 <TextBox x:Name="searchBox" 
+                    Grid.Row="0"
                     Height="30" 
                     VerticalAlignment="Center"
                     Padding="5,0,30,0"
@@ -141,17 +144,19 @@
                         </Style>
                     </TextBox.Resources>
                 </TextBox>
-                <Button Width="30" 
+
+                            <Button Grid.Row="0"
+                        Width="30" 
                         Height="30"
                         HorizontalAlignment="Right"
                         Background="Transparent"
-                        BorderThickness="0"
-                        Click="HandleSearch">
-                    <Path Data="M12,9A3,3 0 0,1 9,12A3,3 0 0,1 6,9A3,3 0 0,1 9,6A3,3 0 0,1 12,9M17.5,14.5L13.2,10.2C13.7,9.4 14,8.5 14,7.5C14,4.5 11.5,2 8.5,2C5.5,2 3,4.5 3,7.5C3,10.5 5.5,13 8.5,13C9.5,13 10.4,12.7 11.2,12.2L15.5,16.5L17.5,14.5Z"
+                        BorderThickness="0">
+                            <Path Data="M12,9A3,3 0 0,1 9,12A3,3 0 0,1 6,9A3,3 0 0,1 9,6A3,3 0 0,1 12,9M17.5,14.5L13.2,10.2C13.7,9.4 14,8.5 14,7.5C14,4.5 11.5,2 8.5,2C5.5,2 3,4.5 3,7.5C3,10.5 5.5,13 8.5,13C9.5,13 10.4,12.7 11.2,12.2L15.5,16.5L17.5,14.5Z"
                           Fill="{StaticResource ClaudeTextSecondary}"
                           Stretch="Uniform"
                           Margin="5"/>
-                </Button>
+                    </Button>
+
                 <ProgressBar x:Name="SearchProgress" 
                  Grid.Row="1"
                  Height="2" 
@@ -171,7 +176,8 @@
               Background="Transparent"
               BorderThickness="0"
               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-              Visibility="Collapsed">
+              Visibility="Collapsed"
+                          SelectionChanged="ResultsListView_SelectionChanged">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Border Background="{StaticResource ClaudeCodeBackground}"
