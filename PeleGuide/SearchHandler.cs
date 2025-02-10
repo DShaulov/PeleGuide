@@ -50,62 +50,12 @@ namespace PeleGuide
                 webView.Visibility = Visibility.Visible;
                 resultsListView.Visibility = Visibility.Collapsed;
 
-                // Load the PDF if it's not already loaded
-                pdfViewer.LoadPdf(result.FilePath);
-
-                // Wait for the viewer to be ready
-                // await WaitForViewerReady();
-
-                // Navigate to the specific page
-                string pageScript = $@"
-                const viewer = document.getElementById('pdfViewer');
-                if (viewer) {{
-                    viewer.setPageNumber({result.PageNumber});
-                }}";
-                await webView.CoreWebView2.ExecuteScriptAsync(pageScript);
-
-                // Highlight the search term
-                string searchScript = $@"
-                const viewer = document.getElementById('pdfViewer');
-                if (viewer) {{
-                    viewer.postMessage({{
-                        type: 'find',
-                        query: '{result.MatchedText.Replace("'", "\\'")}',
-                        highlightAll: true,
-                        caseSensitive: false,
-                        findPrevious: false
-                    }});
-                }}";
-                await webView.CoreWebView2.ExecuteScriptAsync(searchScript);
+                pdfViewer.LoadPdf(result.FilePath, result.PageNumber);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error opening PDF: {ex.Message}");
             }
         }
-
-        //private Task WaitForViewerReady()
-        //{
-        //    var tcs = new TaskCompletionSource<bool>();
-
-        //    if (isViewerReady)
-        //    {
-        //        tcs.SetResult(true);
-        //    }
-        //    else
-        //    {
-        //        EventHandler<CoreWebView2NavigationCompletedEventArgs> handler = null;
-        //        handler = (s, e) =>
-        //        {
-        //            webView.CoreWebView2.NavigationCompleted -= handler;
-        //            isViewerReady = true;
-        //            tcs.SetResult(true);
-        //        };
-        //        webView.CoreWebView2.NavigationCompleted += handler;
-        //    }
-
-        //    return tcs.Task;
-        //}
     }
-
 }

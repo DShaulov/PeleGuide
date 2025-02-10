@@ -9,11 +9,13 @@ using System.Windows.Controls;
 public class PdfViewer
 {
     private readonly WebView2 webView;
+    private string lastPdfPathOpened;
 
     public PdfViewer(WebView2 webView)
     {
         this.webView = webView;
         InitializeAsync();
+        lastPdfPathOpened = string.Empty;
     }
 
     private async void InitializeAsync()
@@ -25,14 +27,25 @@ public class PdfViewer
     /// Updates the webViewer's source to the specified PDF file.
     /// </summary>
     /// <param name="pdfPath"></param>
-    public void LoadPdf(string pdfPath)
+    public async void  LoadPdf(string pdfPath, int pageNum = 1)
     {
         if (webView?.CoreWebView2 == null)
         {
             Debug.WriteLine("WebView2 is not initialized");
             return;
         }
-        
-        webView.Source = new Uri(pdfPath);
+
+        var baseUri = new Uri(pdfPath).AbsoluteUri;
+        var uri = new Uri(baseUri + $"#page={pageNum}");
+        webView.Source = uri;
+
+        // Handle edge case when trying to jump to a page of a previously loaded PDF - the browser caches the previous page and does not jump.
+        if (lastPdfPathOpened == pdfPath)
+        {
+            webView.CoreWebView2.Navigate("about:blank");
+            await Task.Delay(100); // Small delay to ensure blank page loads
+            webView.CoreWebView2.Navigate(uri.ToString());
+        }
+        lastPdfPathOpened = pdfPath;
     }
 }
