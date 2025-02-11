@@ -173,10 +173,11 @@
                 <wv2:WebView2 x:Name="webView" Visibility="Visible"/>
 
                 <ListView x:Name="ResultsListView" 
-              Background="Transparent"
-              BorderThickness="0"
-              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-              Visibility="Collapsed"
+                          Background="Transparent"
+                          BorderThickness="0"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                          Visibility="Collapsed"
+                          FlowDirection="RightToLeft"
                           SelectionChanged="ResultsListView_SelectionChanged">
                     <ListView.ItemTemplate>
                         <DataTemplate>

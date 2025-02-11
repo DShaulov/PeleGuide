@@ -69,10 +69,17 @@ namespace PeleGuide
                             var searchTermPos = 0;
                             while ((searchTermPos = pageText.IndexOf(searchTerm, searchTermPos, StringComparison.OrdinalIgnoreCase)) != -1)
                             {
-                                var contextStart = Math.Max(0, searchTermPos - 50);
-                                var contextLength = Math.Min(100, pageText.Length - contextStart);
+                                var contextStart = Math.Max(0, searchTermPos - 100);
+                                var contextLength = Math.Min(200, pageText.Length - contextStart);
                                 var context = pageText.Substring(contextStart, contextLength);
-
+                                if (contextStart > 0)
+                                {
+                                    context = "...\n" + context;
+                                }
+                                if (contextStart + contextLength < pageText.Length)
+                                {
+                                    context += "\n...";
+                                }
                                 results.Add(new SearchResult
                                 {
                                     FilePath = filePath,

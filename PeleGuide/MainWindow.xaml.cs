@@ -27,7 +27,7 @@ namespace PeleGuide
             pdfViewer = new PdfViewer(webView);
             folderScanner = new FolderScanner();
             searchHandler = new SearchHandler(ResultsListView, SearchProgress, mainFolderPath, webView, pdfViewer);
-
+            webView.Visibility = Visibility.Collapsed;
             InitializeUI();
         }
 
